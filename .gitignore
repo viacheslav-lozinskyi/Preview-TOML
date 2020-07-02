@@ -1,0 +1,4 @@
+/.vs
+/output
+/application/preview-toml.vs/obj
+/application/preview-toml.vs/*.user
