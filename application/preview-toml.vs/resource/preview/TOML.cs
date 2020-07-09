@@ -25,7 +25,7 @@ namespace resource.preview
                 context.
                     Clear().
                     SetContent(__GetErrorMessage(ex.Message)).
-                    SetFlag(atom.Trace.NAME.FLAG.ERROR).
+                    SetFlag(NAME.FLAG.ERROR).
                     SetUrl(url).
                     SetLine(__GetErrorValue(ex.Message, "Line", ",")).
                     SetPosition(__GetErrorValue(ex.Message, "column", ":")).
@@ -157,9 +157,9 @@ namespace resource.preview
         {
             if ((value is TomlTable) || (value is TomlArray) || (value is TomlValue[]))
             {
-                return /*atom.Trace.NAME.PATTERN.ELEMENT*/"";
+                return /*NAME.PATTERN.ELEMENT*/"";
             }
-            return atom.Trace.NAME.PATTERN.VARIABLE;
+            return NAME.PATTERN.VARIABLE;
         }
     };
 }
