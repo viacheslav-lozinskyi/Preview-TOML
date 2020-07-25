@@ -19,24 +19,30 @@ namespace resource.preview
                         __Execute(a_Context1.Value, 1, context, a_Context1.Key);
                     }
                 }
+                if (GetState() == STATE.CANCEL)
+                {
+                    context.
+                        SendWarning(1, NAME.WARNING.TERMINATED);
+                    return;
+                }
             }
             catch (ParseException ex)
             {
                 context.
-                    Clear().
-                    SetContent(__GetErrorMessage(ex.Message)).
-                    SetFlag(NAME.FLAG.ERROR).
                     SetUrl(url).
                     SetLine(__GetErrorValue(ex.Message, "Line", ",")).
                     SetPosition(__GetErrorValue(ex.Message, "column", ":")).
-                    SetLevel(1).
-                    Send();
+                    SendError(1, __GetErrorMessage(ex.Message));
             }
         }
 
         private static void __Execute(object node, int level, atom.Trace context, string name)
         {
             if (node == null)
+            {
+                return;
+            }
+            if (GetState() == STATE.CANCEL)
             {
                 return;
             }
@@ -157,7 +163,7 @@ namespace resource.preview
         {
             if ((value is TomlTable) || (value is TomlArray) || (value is TomlValue[]))
             {
-                return /*NAME.PATTERN.ELEMENT*/"";
+                return NAME.PATTERN.ELEMENT;
             }
             return NAME.PATTERN.VARIABLE;
         }
