@@ -30,8 +30,8 @@ namespace resource.preview
             {
                 context.
                     SetUrl(url).
-                    SetLine(__GetErrorValue(ex.Message, "Line", ",")).
-                    SetPosition(__GetErrorValue(ex.Message, "column", ":")).
+                    SetUrlLine(__GetErrorValue(ex.Message, "Line", ",")).
+                    SetUrlPosition(__GetErrorValue(ex.Message, "column", ":")).
                     SendError(1, __GetErrorMessage(ex.Message));
             }
         }
@@ -53,8 +53,8 @@ namespace resource.preview
                     SetContent(name).
                     SetValue(__GetValue(node)).
                     SetComment(__GetComment(node)).
+                    SetCommentHint("[[Data type]]").
                     SetPattern(__GetPattern(node)).
-                    SetHint("[[Data type]]").
                     SetLevel(level).
                     Send();
             }
