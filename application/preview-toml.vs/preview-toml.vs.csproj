@@ -86,6 +86,15 @@
       <Link>resource\document\LICENSE</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\resource\sample\Sample1.toml">
+      <Link>resource\sample\Sample1.toml</Link>
+    </Content>
+    <Content Include="..\..\resource\sample\Sample2.toml">
+      <Link>resource\sample\Sample2.toml</Link>
+    </Content>
+    <Content Include="..\..\resource\sample\Sample3.toml">
+      <Link>resource\sample\Sample3.toml</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
