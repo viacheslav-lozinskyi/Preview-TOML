@@ -5,7 +5,7 @@ using System;
 
 namespace resource.preview
 {
-    public class TOML : cartridge.AnyPreview
+    internal class VSPreview : cartridge.AnyPreview
     {
         protected override void _Execute(atom.Trace context, string url)
         {
@@ -49,12 +49,11 @@ namespace resource.preview
             if (string.IsNullOrEmpty(name) == false)
             {
                 context.
-                    Clear().
                     SetContent(name).
                     SetValue(__GetValue(node)).
                     SetComment(__GetComment(node)).
                     SetCommentHint("[[Data type]]").
-                    SetPattern(__GetPattern(node)).
+                    SetType(__GetType(node)).
                     SetLevel(level).
                     Send();
             }
@@ -159,13 +158,13 @@ namespace resource.preview
             return "";
         }
 
-        private static string __GetPattern(object value)
+        private static string __GetType(object value)
         {
             if ((value is TomlTable) || (value is TomlArray) || (value is TomlValue[]))
             {
-                return NAME.PATTERN.ELEMENT;
+                return NAME.TYPE.INFO;
             }
-            return NAME.PATTERN.VARIABLE;
+            return NAME.TYPE.VARIABLE;
         }
     };
 }
