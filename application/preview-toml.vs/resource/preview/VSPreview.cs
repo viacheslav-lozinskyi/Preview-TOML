@@ -7,7 +7,7 @@ namespace resource.preview
 {
     internal class VSPreview : cartridge.AnyPreview
     {
-        protected override void _Execute(atom.Trace context, string url)
+        protected override void _Execute(atom.Trace context, string url, int level)
         {
             try
             {
@@ -16,23 +16,17 @@ namespace resource.preview
                 {
                     foreach (var a_Context1 in a_Context.Rows)
                     {
-                        __Execute(a_Context1.Value, 1, context, a_Context1.Key);
+                        __Execute(a_Context1.Value, level, context, a_Context1.Key);
                     }
-                }
-                if (GetState() == STATE.CANCEL)
-                {
-                    context.
-                        SendWarning(1, NAME.WARNING.TERMINATED);
-                    return;
                 }
             }
             catch (ParseException ex)
             {
                 context.
-                    SetUrl(url).
+                    SetUrl(url, "").
                     SetUrlLine(__GetErrorValue(ex.Message, "Line", ",")).
                     SetUrlPosition(__GetErrorValue(ex.Message, "column", ":")).
-                    SendError(1, __GetErrorMessage(ex.Message));
+                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level, __GetErrorMessage(ex.Message));
             }
         }
 
@@ -49,13 +43,8 @@ namespace resource.preview
             if (string.IsNullOrEmpty(name) == false)
             {
                 context.
-                    SetContent(name).
-                    SetValue(__GetValue(node)).
-                    SetComment(__GetComment(node)).
-                    SetCommentHint("[[Data type]]").
-                    SetType(__GetType(node)).
-                    SetLevel(level).
-                    Send();
+                    SetComment(__GetComment(node), "[[Data type]]").
+                    Send(NAME.SOURCE.PREVIEW, __GetType(node), level, name, __GetValue(node));
             }
             if (node is TomlTable)
             {
