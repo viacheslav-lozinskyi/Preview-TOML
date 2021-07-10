@@ -1,95 +1,93 @@
-
 using Nett;
 using Nett.Parser;
 using System;
 
 namespace resource.preview
 {
-    internal class VSPreview : cartridge.AnyPreview
+    internal class VSPreview : extension.AnyPreview
     {
-        protected override void _Execute(atom.Trace context, string url, int level)
+        protected override void _Execute(atom.Trace context, int level, string url, string file)
         {
             try
             {
-                var a_Context = Toml.ReadFile(url);
+                var a_Context = Toml.ReadFile(file);
                 if (a_Context != null)
                 {
                     foreach (var a_Context1 in a_Context.Rows)
                     {
-                        __Execute(a_Context1.Value, level, context, a_Context1.Key);
+                        __Execute(context, level, a_Context1.Value, a_Context1.Key);
                     }
                 }
             }
             catch (ParseException ex)
             {
                 context.
-                    SetUrl(url, "").
-                    SetUrlLine(__GetErrorValue(ex.Message, "Line", ",")).
-                    SetUrlPosition(__GetErrorValue(ex.Message, "column", ":")).
-                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level, __GetErrorMessage(ex.Message));
+                    SetUrl(file, __GetErrorValue(ex.Message, "Line", ","), __GetErrorValue(ex.Message, "column", ":")).
+                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.EXCEPTION, level, __GetErrorMessage(ex.Message)).
+                    SendPreview(NAME.TYPE.EXCEPTION, url);
             }
         }
 
-        private static void __Execute(object node, int level, atom.Trace context, string name)
+        private static void __Execute(atom.Trace context, int level, object data, string name)
         {
-            if (node == null)
+            if (data == null)
             {
                 return;
             }
-            if (GetState() == STATE.CANCEL)
+            if (GetState() == NAME.STATE.CANCEL)
             {
                 return;
             }
             if (string.IsNullOrEmpty(name) == false)
             {
                 context.
-                    SetComment(__GetComment(node), "[[Data type]]").
-                    Send(NAME.SOURCE.PREVIEW, __GetType(node), level, name, __GetValue(node));
+                    SetComment(__GetComment(data), "[[[Data Type]]]").
+                    Send(NAME.SOURCE.PREVIEW, __GetType(data), level, name, __GetValue(data));
             }
-            if (node is TomlTable)
+            if (data is TomlTable)
             {
-                foreach (var a_Context in (node as TomlTable).Rows)
+                foreach (var a_Context in (data as TomlTable).Rows)
                 {
-                    __Execute(a_Context.Value, level + 1, context, a_Context.Key);
+                    __Execute(context, level + 1, a_Context.Value, a_Context.Key);
                 }
             }
-            if (node is TomlArray)
+            if (data is TomlArray)
             {
                 var a_Index = 0;
-                foreach (var a_Context in (node as TomlArray).Items)
+                foreach (var a_Context in (data as TomlArray).Items)
                 {
                     a_Index++;
-                    __Execute(a_Context.UntypedValue, level + 1, context, "[" + a_Index.ToString() + "]");
+                    __Execute(context, level + 1, a_Context.UntypedValue, "[" + a_Index.ToString() + "]");
                 }
             }
-            if (node is TomlValue[])
+            if (data is TomlValue[])
             {
                 var a_Index = 0;
-                foreach (var a_Context in (node as TomlValue[]))
+                foreach (var a_Context in (data as TomlValue[]))
                 {
                     a_Index++;
-                    __Execute(a_Context.UntypedValue, level + 1, context, "[" + a_Index.ToString() + "]");
+                    __Execute(context, level + 1, a_Context.UntypedValue, "[" + a_Index.ToString() + "]");
                 }
             }
         }
 
-        private static string __GetErrorMessage(string value)
+        private static string __GetErrorMessage(string data)
         {
-            var a_Index = value.IndexOf(":");
+            var a_Index = data.IndexOf(":");
             if (a_Index > 0)
             {
-                return value.Substring(a_Index + 1);
+                return data.Substring(a_Index + 1);
             }
-            return value;
+            return data;
         }
 
-        private static int __GetErrorValue(string value, string begin, string end)
+        private static int __GetErrorValue(string data, string begin, string end)
         {
-            var a_Index1 = value.IndexOf(begin);
-            var a_Index2 = value.IndexOf(end);
+            var a_Index1 = data.IndexOf(begin);
+            var a_Index2 = data.IndexOf(end);
             if ((a_Index1 >= 0) && (a_Index2 >= 0) && (a_Index1 < a_Index2))
             {
-                var a_Context = value.Substring(a_Index1 + begin.Length, a_Index2 - a_Index1 - begin.Length).Trim();
+                var a_Context = data.Substring(a_Index1 + begin.Length, a_Index2 - a_Index1 - begin.Length).Trim();
                 var a_Result = 0.0;
                 if ((string.IsNullOrEmpty(a_Context) == false) && double.TryParse(a_Context, out a_Result))
                 {
@@ -99,61 +97,61 @@ namespace resource.preview
             return 0;
         }
 
-        private static string __GetValue(object value)
+        private static string __GetValue(object data)
         {
-            if (value is TomlArray)
+            if (data is TomlArray)
             {
                 return "";
             }
-            if (value is TomlObject)
+            if (data is TomlObject)
             {
-                return GetCleanString((value as TomlObject).ToString());
+                return GetFinalText((data as TomlObject).ToString());
             }
-            if (value is TomlValue[])
+            if (data is TomlValue[])
             {
                 return "";
             }
-            return (value == null) ? "" : value.ToString();
+            return (data == null) ? "" : data.ToString();
         }
 
-        private static string __GetComment(object value)
+        private static string __GetComment(object data)
         {
-            if (value is TomlValue[])
+            if (data is TomlValue[])
             {
-                return "[[Array]]";
+                return "[[[Array]]]";
             }
-            if (value is TomlObject)
+            if (data is TomlObject)
             {
-                var a_Result = (value as TomlObject).TomlType.ToString();
+                var a_Result = (data as TomlObject).TomlType.ToString();
                 {
-                    if (a_Result == "Array") return "[[Array]]";
-                    if (a_Result == "DateTime") return "[[Time]]";
-                    if (a_Result == "Float") return "[[Float]]";
-                    if (a_Result == "String") return "[[String]]";
-                    if (a_Result == "Int") return "[[Integer]]";
-                    if (a_Result == "Table") return "[[Object]]";
-                    if (a_Result == "Bool") return "[[Boolean]]";
+                    if (a_Result == "Array") return "[[[Array]]]";
+                    if (a_Result == "DateTime") return "[[[Time]]]";
+                    if (a_Result == "Float") return "[[[Float]]]";
+                    if (a_Result == "String") return "[[[String]]]";
+                    if (a_Result == "Int") return "[[[Integer]]]";
+                    if (a_Result == "Table") return "[[[Object]]]";
+                    if (a_Result == "Bool") return "[[[Boolean]]]";
                 }
                 return a_Result;
             }
             {
-                if (value is DateTime) return "[[Time]]";
-                if (value is Double) return "[[Float]]";
-                if (value is String) return "[[String]]";
-                if (value is Int32) return "[[Integer]]";
-                if (value is Int64) return "[[Integer]]";
-                if (value is Boolean) return "[[Boolean]]";
+                if (data is DateTime) return "[[[Time]]]";
+                if (data is Double) return "[[[Float]]]";
+                if (data is String) return "[[[String]]]";
+                if (data is Int32) return "[[[Integer]]]";
+                if (data is Int64) return "[[[Integer]]]";
+                if (data is Boolean) return "[[[Boolean]]]";
             }
             return "";
         }
 
-        private static string __GetType(object value)
+        private static string __GetType(object data)
         {
-            if ((value is TomlTable) || (value is TomlArray) || (value is TomlValue[]))
+            if ((data is TomlTable) || (data is TomlArray) || (data is TomlValue[]))
             {
-                return NAME.TYPE.INFO;
+                return NAME.TYPE.PARAMETER;
             }
-            return NAME.TYPE.VARIABLE;
+            return NAME.TYPE.PARAMETER;
         }
     };
 }
