@@ -23,8 +23,8 @@ namespace resource.preview
             {
                 context.
                     SetUrl(file, __GetErrorValue(ex.Message, "Line", ","), __GetErrorValue(ex.Message, "column", ":")).
-                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.EXCEPTION, level, __GetErrorMessage(ex.Message)).
-                    SendPreview(NAME.TYPE.EXCEPTION, url);
+                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.EXCEPTION, level, __GetErrorMessage(ex.Message)).
+                    SendPreview(NAME.EVENT.EXCEPTION, url);
             }
         }
 
@@ -149,9 +149,9 @@ namespace resource.preview
         {
             if ((data is TomlTable) || (data is TomlArray) || (data is TomlValue[]))
             {
-                return NAME.TYPE.PARAMETER;
+                return NAME.EVENT.PARAMETER;
             }
-            return NAME.TYPE.PARAMETER;
+            return NAME.EVENT.PARAMETER;
         }
     };
 }
