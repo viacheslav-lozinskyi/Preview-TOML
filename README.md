@@ -8,16 +8,19 @@
 
 ---
 
+## Important information:
 [![MetaOutput](https://www.metaoutput.net/_functions/watch?utm_source=github.com&utm_medium=referral&utm_campaign=view-on-github&utm_content=Preview-TOML&source=GITHUB&size=128x128&project=Preview-TOML&url=https://github.com/viacheslav-lozinskyi/Preview-TOML)](https://www.metaoutput.net/)
 
-### This extension is working only with installed [MetaOutput](https://www.metaoutput.net/) extension!
+This extension is working only with installed [MetaOutput](https://www.metaoutput.net/) extension!
 
 ---
 
+## Description:
 ### Now you can look inside [TOML](https://en.wikipedia.org/wiki/TOML) files not opening it.
 
 ---
 
+## How it works:
 ![Image](https://viacheslav-lozinskyi.github.io/Preview-TOML/resource/video/Presentation1.gif)
 
 ---
