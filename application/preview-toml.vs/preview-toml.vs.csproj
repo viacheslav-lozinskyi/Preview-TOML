@@ -44,8 +44,8 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MetaOutput.Media">
-      <Version>1.0.5</Version>
+    <PackageReference Include="MetaOutput.Client">
+      <Version>1.0.4</Version>
     </PackageReference>
     <PackageReference Include="Nett">
       <Version>0.15.0</Version>
